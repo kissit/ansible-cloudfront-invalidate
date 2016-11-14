@@ -1,0 +1,13 @@
+- name: "Example playbook showing usage of cloudfront_invalidate module"
+  hosts: localhost
+  connection: local
+  gather_facts: False
+
+  tasks:
+    - name: "Make an example invalidation request for two paths"
+      cloudfront_invalidate:
+        distribution_id: "YOUR CLOUDFRONT DIST ID"
+        path: "{{ item }}"
+      with_items:
+        - "/js/*"
+        - "example.gif"
