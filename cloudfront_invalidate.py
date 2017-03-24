@@ -78,6 +78,7 @@ try:
     import boto.ec2
     from boto import cloudfront
     from boto.cloudfront import CloudFrontConnection
+    from boto3 import Session
     HAS_BOTO = True
 except ImportError:
     HAS_BOTO = False
@@ -85,7 +86,9 @@ except ImportError:
 
 def main():
     argument_spec = aws_common_argument_spec()
+
     argument_spec.update(dict(
+            profile_name = dict(required=True),
             distribution_id = dict(required=True),
             path = dict(required=True),
         )
@@ -93,16 +96,17 @@ def main():
     module = AnsibleModule(argument_spec=argument_spec)
 
     if not HAS_BOTO:
-        module.fail_json(msg='boto required for this module')
+        module.fail_json(msg='boto 2/3 required for this module')
 
     distribution_id = module.params.get('distribution_id')
     path = module.params.get('path')
-  
-    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
+    profile_name = module.params.get('profile_name')
+
+    session = Session(profile_name=profile_name).get_credentials()
 
     # connect to Cloudfront
     try:
-        conn = CloudFrontConnection(**aws_connect_kwargs)
+        conn = CloudFrontConnection(session.access_key,session.secret_key)
     except boto.exception.BotoServerError as e:
         module.fail_json(msg = e.error_message)
 
