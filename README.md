@@ -17,6 +17,7 @@ This is a simple Ansible module used to make AWS Cloudfront invalidation request
 ```
 - name: "Invalidate a single path"
   cloudfront_invalidate: 
+    profile_name: YOUR_AWS_PROFILE_NAME
     distribution_id: YOUR_CLOUDFRONT_DIST_ID
     path: "/js/*"
 ```
@@ -24,6 +25,7 @@ This is a simple Ansible module used to make AWS Cloudfront invalidation request
 ```
 - name: "Invalidate multiple paths"
   cloudfront_invalidate: 
+    profile_name: YOUR_AWS_PROFILE_NAME
     distribution_id: YOUR_CLOUDFRONT_DIST_ID
     path: "{{ item }}"
   with_items:
