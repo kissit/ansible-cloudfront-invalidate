@@ -34,11 +34,17 @@ description:
     - Makes Cloudfront invalidation requests.  The Cloudfront distribution id is referenced by its id. It is designed to be used for tasks such as code deployments where static assets are updated on a Cloudfront distribution and need to have their cache cleared.  This module has a dependency on python-boto.
 version_added: "1.0"
 options:
+  profile_name:
+    description:
+      - The AWS Profile Name.
+    required: true
+    default: null 
+    aliases: []
   distribution_id:
     description:
       - The Cloudfront Distribution ID.
     required: true
-    default: null 
+    default: null
     aliases: []
   path:
     description:
@@ -58,13 +64,15 @@ EXAMPLES = '''
 tasks:
 - name: "Invalidate a single path"
   cloudfront_invalidate: 
+    profile_name: YOUR_AWS_PROFILE_NAME
     distribution_id: YOUR_CLOUDFRONT_DIST_ID
     path: /js/*
 
 # Basic example of invalidating a multiple paths
 tasks:
 - name: "Invalidate multiple paths"
-  cloudfront_invalidate: 
+  cloudfront_invalidate:
+    profile_name: YOUR_AWS_PROFILE_NAME
     distribution_id: YOUR_CLOUDFRONT_DIST_ID
     path: {{ item }}
   with_items:
