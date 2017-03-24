@@ -6,6 +6,7 @@
   tasks:
     - name: "Make an example invalidation request for two paths"
       cloudfront_invalidate:
+        profile_name: "YOUR AWS PROFILE NAME"
         distribution_id: "YOUR CLOUDFRONT DIST ID"
         path: "{{ item }}"
       with_items:
