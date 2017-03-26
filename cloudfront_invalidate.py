@@ -34,11 +34,17 @@ description:
     - Makes Cloudfront invalidation requests.  The Cloudfront distribution id is referenced by its id. It is designed to be used for tasks such as code deployments where static assets are updated on a Cloudfront distribution and need to have their cache cleared.  This module has a dependency on python-boto.
 version_added: "1.0"
 options:
+  profile_name:
+    description:
+      - The AWS Profile Name.
+    required: true
+    default: null 
+    aliases: []
   distribution_id:
     description:
       - The Cloudfront Distribution ID.
     required: true
-    default: null 
+    default: null
     aliases: []
   path:
     description:
@@ -58,13 +64,15 @@ EXAMPLES = '''
 tasks:
 - name: "Invalidate a single path"
   cloudfront_invalidate: 
+    profile_name: YOUR_AWS_PROFILE_NAME
     distribution_id: YOUR_CLOUDFRONT_DIST_ID
     path: /js/*
 
 # Basic example of invalidating a multiple paths
 tasks:
 - name: "Invalidate multiple paths"
-  cloudfront_invalidate: 
+  cloudfront_invalidate:
+    profile_name: YOUR_AWS_PROFILE_NAME
     distribution_id: YOUR_CLOUDFRONT_DIST_ID
     path: {{ item }}
   with_items:
@@ -78,6 +86,7 @@ try:
     import boto.ec2
     from boto import cloudfront
     from boto.cloudfront import CloudFrontConnection
+    from boto3 import Session
     HAS_BOTO = True
 except ImportError:
     HAS_BOTO = False
@@ -85,7 +94,9 @@ except ImportError:
 
 def main():
     argument_spec = aws_common_argument_spec()
+
     argument_spec.update(dict(
+            profile_name = dict(required=True),
             distribution_id = dict(required=True),
             path = dict(required=True),
         )
@@ -93,16 +104,17 @@ def main():
     module = AnsibleModule(argument_spec=argument_spec)
 
     if not HAS_BOTO:
-        module.fail_json(msg='boto required for this module')
+        module.fail_json(msg='boto 2/3 required for this module')
 
     distribution_id = module.params.get('distribution_id')
     path = module.params.get('path')
-  
-    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
+    profile_name = module.params.get('profile_name')
+
+    session = Session(profile_name=profile_name).get_credentials()
 
     # connect to Cloudfront
     try:
-        conn = CloudFrontConnection(**aws_connect_kwargs)
+        conn = CloudFrontConnection(session.access_key,session.secret_key)
     except boto.exception.BotoServerError as e:
         module.fail_json(msg = e.error_message)
 
