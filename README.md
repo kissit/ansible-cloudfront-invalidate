@@ -5,7 +5,19 @@ This is a simple Ansible module used to make AWS Cloudfront invalidation request
 ### Requirements
 * First and foremost, you need Ansible installed and configured for your environment
 * python-boto
-* The standard EC2 related modules configured for your AWS connection either as environment vars or Ansible vars (or both).
+* The standard EC2 related modules configured for your AWS connection either as environment vars or Ansible vars (or both) or create next files:
+
+```
+~/.aws/config
+    [deploy]
+    aws_access_key_id=foo
+    aws_secret_access_key=bar
+
+~/.aws/credentials
+    [profile deploy]
+    region=foo-region
+```
+
 
 ### Installation & Configuration
 * Clone/download this repo
